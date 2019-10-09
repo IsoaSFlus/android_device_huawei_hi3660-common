@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 The LineageOS Project
+# Copyright 2019 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,16 @@
 # limitations under the License.
 #
 
-VENDOR_PATH := device/huawei/kirin970-common
+# This contains the module build definitions for the hardware-specific
+# components for this device.
+#
+# As much as possible, those components should be built unconditionally,
+# with device-specific names to avoid collisions, to avoid device-specific
+# bitrot and build breakages. Building a component unconditionally does
+# *not* include it on all devices, so it is safe even with hardware-specific
+# components.
+
+VENDOR_PATH := device/huawei/hi6250-common
 
 # Architecture
 TARGET_ARCH := arm64
@@ -43,8 +52,8 @@ BOARD_KERNEL_TAGS_OFFSET := 0x07988000
 BOARD_RAMDISK_OFFSET := 0x07B88000
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset $(BOARD_RAMDISK_OFFSET) --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 TARGET_KERNEL_ARCH := arm64
-TARGET_KERNEL_SOURCE := kernel/huawei/kirin970
-TARGET_KERNEL_CONFIG := merge_kirin970_defconfig
+TARGET_KERNEL_SOURCE := kernel/huawei/hi6250
+TARGET_KERNEL_CONFIG := merge_hi6250_defconfig
 TARGET_KERNEL_CROSS_COMPILE_PREFIX := aarch64-linux-android-
 
 # Properties
@@ -70,8 +79,8 @@ TARGET_USES_HWC2 := true
 DEVICE_FRAMEWORK_MANIFEST_FILE := $(VENDOR_PATH)/framework_manifest.xml
 
 # Init
-TARGET_INIT_VENDOR_LIB := libinit_kirin970
-TARGET_RECOVERY_DEVICE_MODULES := libinit_kirin970
+TARGET_INIT_VENDOR_LIB := libinit_hi6250
+TARGET_RECOVERY_DEVICE_MODULES := libinit_hi6250
 
 # Partitions
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
@@ -85,7 +94,7 @@ TARGET_COPY_OUT_VENDOR := vendor
 TARGET_PROVIDES_QTI_TELEPHONY_JAR := true
 
 # Recovery
-TARGET_RECOVERY_FSTAB := $(VENDOR_PATH)/rootdir/etc/fstab.kirin970
+TARGET_RECOVERY_FSTAB := $(VENDOR_PATH)/rootdir/etc/fstab.hi6250
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 TARGET_USES_MKE2FS := true
