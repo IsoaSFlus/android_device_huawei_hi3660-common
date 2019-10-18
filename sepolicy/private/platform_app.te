@@ -1,1 +1,0 @@
-allow platform_app device:file { r_file_perms };

@@ -1,2 +1,0 @@
-# Allow mediaextractor read media files
-allow mediaextractor vfat:file { rw_file_perms setattr };
