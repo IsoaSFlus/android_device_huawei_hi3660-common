@@ -20,3 +20,5 @@ allow init vendor_configs_file:dir mounton;
 
 # Allow init to load kernel modules
 allow init kernel:system module_request;
+
+#allow init vendor_file:file execute_no_trans;

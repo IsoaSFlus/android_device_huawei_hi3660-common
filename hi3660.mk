@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-$(call inherit-product, vendor/huawei/hi6250-common/hi6250-common-vendor.mk)
+$(call inherit-product, vendor/huawei/hi3660-common/hi3660-common-vendor.mk)
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
@@ -25,12 +25,12 @@ DEVICE_PACKAGE_OVERLAYS += \
 -include $(LOCAL_PATH)/system_prop.mk
 
 # Audio
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/audio/audio_policy_configuration.xml:system/etc/audio_policy_configuration.xml
+#PRODUCT_COPY_FILES += \
+#    $(LOCAL_PATH)/audio/audio_policy_configuration.xml:system/etc/audio_policy_configuration.xml
 
 # bfm
-PRODUCT_PACKAGES += \
-    bfm-ctl
+#PRODUCT_PACKAGES += \
+#    bfm-ctl
 
 # Camera
 PRODUCT_PACKAGES += \
@@ -38,7 +38,7 @@ PRODUCT_PACKAGES += \
 
 # Device init scripts
 PRODUCT_PACKAGES += \
-    init.hi6250.rc
+    init.hi3660.rc
 
 # Display
 PRODUCT_PACKAGES += \
@@ -49,8 +49,8 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/fingerprint.kl:system/usr/keylayout/fingerprint.kl
 
 # LineageHw
-PRODUCT_PACKAGES += \
-    lineage.touch@1.0-service.hi6250
+#PRODUCT_PACKAGES += \
+#    lineage.touch@1.0-service.hi3660
 
 # NFC
 PRODUCT_PACKAGES += \

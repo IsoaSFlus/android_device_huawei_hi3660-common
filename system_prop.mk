@@ -16,7 +16,7 @@
 
 # Audio
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.config.media_vol_steps=25 \
+    ro.config.media_vol_steps=20 \
     ro.config.vc_call_vol_steps=7
 
 # Perf
@@ -26,3 +26,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # USB
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.cust.cdrom=/dev/null
+
+# Display
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.sf.lcd_density=480
