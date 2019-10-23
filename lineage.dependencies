@@ -1,2 +1,10 @@
 [
+  {
+    "repository": "android_kernel_huawei_hi3660",
+    "target_path": "kernel/huawei/hi3660"
+  },
+  {
+    "repository": "android_packages_resources_devicesettings",
+    "target_path": "packages/resources/devicesettings"
+  }
 ]
