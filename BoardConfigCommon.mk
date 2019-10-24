@@ -54,7 +54,7 @@ BOARD_MKBOOTIMG_ARGS := --ramdisk_offset $(BOARD_RAMDISK_OFFSET) --tags_offset $
 TARGET_KERNEL_ARCH := arm64
 TARGET_KERNEL_SOURCE := kernel/huawei/hi3660
 TARGET_KERNEL_CONFIG := merge_hi3660_defconfig
-TARGET_KERNEL_CROSS_COMPILE_PREFIX := aarch64-linux-android-
+#TARGET_KERNEL_CROSS_COMPILE_PREFIX := aarch64-linux-android-
 
 # Properties
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
