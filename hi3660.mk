@@ -78,5 +78,5 @@ PRODUCT_PACKAGES += \
     resize2fs_static
 
 # Trust HAL
-PRODUCT_PACKAGES += \
-    lineage.trust@1.0-service
+#PRODUCT_PACKAGES += \
+#    lineage.trust@1.0-service
