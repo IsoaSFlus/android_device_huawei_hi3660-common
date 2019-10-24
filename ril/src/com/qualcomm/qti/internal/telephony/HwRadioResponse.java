@@ -23,6 +23,7 @@ import android.os.Message;
 import android.telephony.SignalStrength;
 
 import com.android.internal.telephony.RIL;
+import com.android.internal.telephony.RILRequest;
 import com.android.internal.telephony.RadioResponse;
 
 import com.qualcomm.qti.internal.telephony.HwRIL;
@@ -62,12 +63,12 @@ public class HwRadioResponse extends RadioResponse {
 
     private void responseSignalStrength(RadioResponseInfo responseInfo,
                                         android.hardware.radio.V1_0.SignalStrength sigStrength) {
-        Object rr = mHwRil.processResp(responseInfo);
+        RILRequest rr = mHwRil.processResp(responseInfo);
 
         if (rr != null) {
             SignalStrength ret = HwRIL.convertHalSignalStrength(sigStrength, mHwRil);
             if (responseInfo.error == RadioError.NONE) {
-                sendMessageResponse(mHwRil.getMsgFromRequest(rr), ret);
+                sendMessageResponse(rr.getResult(), ret);
             }
             mHwRil.processRespDone(rr, responseInfo, ret);
         }

@@ -21,7 +21,6 @@ import android.telephony.Rlog;
 
 import com.android.internal.telephony.CommandsInterface;
 import com.android.internal.telephony.Phone;
-import com.android.internal.telephony.PhoneNotifier;
 import com.android.internal.telephony.RIL;
 import com.android.internal.telephony.TelephonyComponentFactory;
 
@@ -46,15 +45,6 @@ public class QtiTelephonyComponentFactory extends TelephonyComponentFactory {
             int cdmaSubscription, Integer instanceId) {
         Rlog.d(LOG_TAG, "makeHwRIL");
         return new HwRIL(context, preferredNetworkType, cdmaSubscription, instanceId);
-    }
-
-    @Override
-    public Phone makePhone(Context context, CommandsInterface ci, PhoneNotifier notifier,
-            int phoneId, int precisePhoneType,
-            TelephonyComponentFactory telephonyComponentFactory) {
-        Rlog.d(LOG_TAG, "makeHwPhone");
-        return new HwGsmCdmaPhone(context, ci, notifier, phoneId, precisePhoneType,
-                telephonyComponentFactory);
     }
 
 }
