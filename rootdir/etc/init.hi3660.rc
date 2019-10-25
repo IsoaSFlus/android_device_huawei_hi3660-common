@@ -1,55 +1,104 @@
-import /vendor/etc/init/${ro.bootmode}/init.${ro.bootmode}.rc
+import init.${ro.hardware}.usb.rc
+import init.${ro.hardware}.power.rc
 
 on init
-    symlink /dev/block/platform/${ro.boot.boot_devices} /dev/block/bootdevice
+    # mount debugfs
+    mount debugfs /sys/kernel/debug /sys/kernel/debug mode=755
 
-on boot
-    chmod 0660 /dev/nxp_smartpa_dev
-    chown media media /dev/nxp_smartpa_dev
+    # disable transparent huge pages
+    write /sys/kernel/mm/transparent_hugepage/enabled "never"
+
+    # Initialize cpusets to boot-time values
+    write /dev/cpuset/foreground/cpus 0-7
+    write /dev/cpuset/background/cpus 0-7
+    write /dev/cpuset/system-background/cpus 0-7
+    write /dev/cpuset/top-app/cpus 0-7
+
+    # Create UDS structure for base VR services
+    mkdir /dev/socket/pdx 0775 system system
+    mkdir /dev/socket/pdx/system 0775 system system
+    mkdir /dev/socket/pdx/system/buffer_hub 0775 system system
+    mkdir /dev/socket/pdx/system/performance 0775 system system
+    mkdir /dev/socket/pdx/system/vr 0775 system system
+    mkdir /dev/socket/pdx/system/vr/display 0775 system system
+    mkdir /dev/socket/pdx/system/vr/pose 0775 system system
+    mkdir /dev/socket/pdx/system/vr/sensors 0775 system system
+
+    start watchdogd
 
 on fs
-    mount ext4 /dev/block/by-name/cust /cust wait ro
-    mount ext4 /dev/block/by-name/cust${ro.boot.slot_suffix} /cust wait ro
-    mount ext4 /dev/block/by-name/preload /preload wait ro
-    mount ext4 /dev/block/by-name/preload${ro.boot.slot_suffix} /preload wait ro
-    mount ext4 /dev/block/by-name/product /product wait ro
-    mount ext4 /dev/block/by-name/product${ro.boot.slot_suffix} /product wait ro
-    mount ext4 /dev/block/by-name/version /version wait ro
-    mount ext4 /dev/block/by-name/version${ro.boot.slot_suffix} /version wait ro
-    mount none /odm/hw_odm/${ro.boot.product.hardware.sku} /hw_odm bind
-    mount none /product/lost+found /product/app bind
-#    mount none /vendor/lost+found /vendor/etc/audio bind
+    mount_all /vendor/etc/fstab.${ro.hardware}
+    setprop ro.crypto.fuse_sdcard false
+
+on post-fs
+
+    # set RLIMIT_MEMLOCK to 8MB
+    setrlimit 8 8388608 8388608
+
+    # For legacy support
+    # See storage config details at http://source.android.com/tech/storage/
+    # since /storage is mounted on post-fs in init.rc
+    symlink /sdcard /storage/sdcard0
+
+    # BT LED sysfs entry
+    write /sys/class/leds/bt_active/trigger "hci1rx"
+
+    chmod 0666 /dev/ion
+    chmod 0666 /dev/graphics/fb0
+
+# fake some battery state
+    setprop status.battery.state Slow
+    setprop status.battery.level 5
+    setprop status.battery.level_raw  50
+    setprop status.battery.level_scale 9
+
+# avoid USB crash
+    setprop persist.adb.nonblocking_ffs 0
+    setprop ro.adb.nonblocking_ffs 0
+
+# enable Google-specific location features,
+# like NetworkLocationProvider and LocationCollector
+    setprop ro.com.google.locationfeatures 1
+
+# enable test harness
+    setprop ro.test_harness true
 
 on post-fs-data
-    start teecd
+    mkdir /data/media 0770 media_rw media_rw
+    mkdir /data/misc/gatord 0700 root root
+    # Set SELinux security contexts for files used by lava.
+    restorecon_recursive /data/local/tmp/lava
 
-on property:ro.lineage.device=*
-    setprop qemu.hw.mainkeys 1
+on zygote-start
+    mkdir /data/vendor/wifi 0770 wifi wifi
+    mkdir /data/vendor/wifi/wpa 0770 wifi wifi
+    mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
 
-on property:sys.user.0.ce_available=true
-    mkdir /data/sec_storage_data 0700 system system
-    mkdir /data/sec_storage_data_users 0700 system system
+on property:sys.boot_completed=1
+    # update cpuset now that processors are up
+    # Foreground should contain most cores (7 is reserved for top-app)
+    write /dev/cpuset/foreground/cpus 0-6
 
+    # top-app gets all cpus (including reserved #7)
+    write /dev/cpuset/top-app/cpus 0-7
 
-service charger /sbin/chargeonlymode -p
-    class charger
-    user root
-    group root system
-    critical
-    seclabel u:r:charger:s0
+    #background contains a small subset (generally one little core)
+    write /dev/cpuset/background/cpus 0
 
-service aptouch /system/bin/true
+    # add system-background cpuset, a new cpuset for system services
+    # that should not run on larger cores
+    # system-background is for system tasks that should only run on
+    # little cores, not on bigs to be used only by init
+    write /dev/cpuset/system-background/cpus 0-3
+
+# Set watchdog timer to 30 seconds and pet it every 10 seconds to get a 20 second margin
+service watchdogd /system/bin/watchdogd 10 20
+    class core
+    oneshot
+    seclabel u:r:watchdogd:s0
+
+service bugreport /system/bin/dumpstate -d -p -B -z \
+    -o /data/user_de/0/com.android.shell/files/bugreports/bugreport
+    class main
     disabled
-    oneshot 
-    
-service displayeffect-1-0 /system/bin/true
-    disabled
-    oneshot 
-
-service activityrecognition_1_1 /system/bin/true
-    disabled
-    oneshot 
-
-service pmom /system/bin/true
-    disabled
-    oneshot 
+    oneshot

@@ -23,6 +23,8 @@
 # *not* include it on all devices, so it is safe even with hardware-specific
 # components.
 
+include build/make/target/board/generic_arm64_ab/BoardConfig.mk
+
 VENDOR_PATH := device/huawei/hi3660-common
 
 # Architecture
@@ -88,7 +90,9 @@ BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
 BOARD_BOOTIMAGE_PARTITION_SIZE := 25165824
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_CACHEIMAGE_PARTITION_SIZE := 16777216
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3707764736
+ifeq ($(BOARD_SYSTEMIMAGE_PARTITION_RESERVED_SIZE),)
+    BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3707764736
+endif
 TARGET_COPY_OUT_VENDOR := vendor
 
 # Radio
