@@ -2,33 +2,59 @@ import /vendor/etc/init/${ro.bootmode}/init.${ro.bootmode}.rc
 
 on init
     symlink /dev/block/platform/${ro.boot.boot_devices} /dev/block/bootdevice
+    mkdir /dev/stune/boost
+    mkdir /dev/stune/system-background
+    mkdir /dev/stune/key-background
+    chown system system /dev/stune/boost
+    chown system system /dev/stune/system-background
+    chown system system /dev/stune/key-background
+    chown system system /dev/stune/boost/tasks
+    chown system system /dev/stune/system-background/tasks
+    chown system system /dev/stune/key-background/tasks
+    chmod 0664 /dev/stune/boost/tasks
+    chmod 0664 /dev/stune/system-background/tasks
+    chmod 0664 /dev/stune/key-background/tasks
+
+    chown system system /dev/stune/schedtune.boost
+    chown system system /dev/stune/foreground/schedtune.boost
+    chown system system /dev/stune/top-app/schedtune.boost
+    chown system system /dev/stune/boost/schedtune.boost
+    chown system system /dev/stune/background/schedtune.boost
+    chown system system /dev/stune/system-background/schedtune.boost
+    chown system system /dev/stune/key-background/schedtune.boost
+    chmod 0664 /dev/stune/schedtune.boost
+    chmod 0664 /dev/stune/foreground/schedtune.boost
+    chmod 0664 /dev/stune/top-app/schedtune.boost
+    chmod 0664 /dev/stune/boost/schedtune.boost
+    chmod 0664 /dev/stune/background/schedtune.boost
+    chmod 0664 /dev/stune/system-background/schedtune.boost
+    chmod 0664 /dev/stune/key-background/schedtune.boost
 
 on boot
     chmod 0660 /dev/nxp_smartpa_dev
     chown media media /dev/nxp_smartpa_dev
+#bluetooth
+    mkdir /data/log/bt
+    chown bluetooth bluetooth /data/log/bt
+    chmod 775 /data/log/bt
+
 
 on fs
-    mount ext4 /dev/block/by-name/cust /cust wait ro
-    mount ext4 /dev/block/by-name/cust${ro.boot.slot_suffix} /cust wait ro
-    mount ext4 /dev/block/by-name/preload /preload wait ro
-    mount ext4 /dev/block/by-name/preload${ro.boot.slot_suffix} /preload wait ro
-    mount ext4 /dev/block/by-name/product /product wait ro
-    mount ext4 /dev/block/by-name/product${ro.boot.slot_suffix} /product wait ro
-    mount ext4 /dev/block/by-name/version /version wait ro
-    mount ext4 /dev/block/by-name/version${ro.boot.slot_suffix} /version wait ro
-    mount none /odm/hw_odm/${ro.boot.product.hardware.sku} /hw_odm bind
-    mount none /product/lost+found /product/app bind
+    mount_all /vendor/etc/fstab.${ro.hardware}
+#    mount none /odm/hw_odm/${ro.boot.product.hardware.sku} /hw_odm bind
+#    mount none /product/lost+found /product/app bind
 #    mount none /vendor/lost+found /vendor/etc/audio bind
 
 on post-fs-data
+    mkdir /data/sec_storage_data 0700 system system
+    restorecon /data/sec_storage_data
+    mkdir /data/sec_storage_data_users 0700 system system
+    restorecon /data/sec_storage_data_users
+
     start teecd
 
 on property:ro.lineage.device=*
     setprop qemu.hw.mainkeys 1
-
-on property:sys.user.0.ce_available=true
-    mkdir /data/sec_storage_data 0700 system system
-    mkdir /data/sec_storage_data_users 0700 system system
 
 
 service charger /sbin/chargeonlymode -p
